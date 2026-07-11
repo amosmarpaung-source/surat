@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surat Untuk RARA</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #fce4ec;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Container Pembungkus */
+        .wrapper {
+            position: relative;
+            cursor: pointer;
+        }
+
+        /* Tampilan Amplop */
+        .envelope {
+            width: 300px;
+            height: 200px;
+            background-color: #f48fb1;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+
+        .wrapper:hover .envelope {
+            transform: translateY(-5px);
+        }
+
+        /* Lipatan Atas Amplop */
+        .flap {
+            position: absolute;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 110px solid #f06292;
+            transform-origin: top;
+            transition: transform 0.5s ease-in-out;
+            z-index: 3;
+        }
+
+        /* Tulisan di Depan Amplop */
+        .envelope-text {
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            z-index: 2;
+            margin-top: 40px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* Tampilan Surat (Tersembunyi di dalam Amplop) */
+        .letter {
+            position: absolute;
+            bottom: 10px;
+            width: 260px;
+            height: 180px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.6s ease-in-out, opacity 0.4s ease-in-out;
+            z-index: 1;
+            opacity: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .letter p {
+            color: #333;
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .letter .from {
+            font-weight: bold;
+            color: #d81b60;
+            font-size: 14px;
+        }
+
+        /* Efek Saat Amplop Di-klik (Terbuka) */
+        .wrapper.open .flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        .wrapper.open .letter {
+            transform: translateY(-130px);
+            opacity: 1;
+            z-index: 2;
+        }
+
+        /* Petunjuk Tambahan */
+        .hint {
+            position: absolute;
+            bottom: -40px;
+            width: 100%;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper" id="envelopeWrapper">
+        <div class="flap"></div>
+        <div class="envelope">
+            <span class="envelope-text">For: RARA</span>
+        </div>
+        <div class="letter">
+            <p>Semoga sakitnya cepat sembuh ya buat RARA, tetap semangat! Tuhan Yesus memberkati.</p>
+            <div class="from">From: Yowelll</div>
+        </div>
+        <div class="hint" id="hintText">Klik amplop untuk membuka</div>
+    </div>
+
+    <script>
+        const envelopeWrapper = document.getElementById('envelopeWrapper');
+        const hintText = document.getElementById('hintText');
+
+        // Menambahkan alur saat amplop diklik
+        envelopeWrapper.addEventListener('click', function() {
+            // Toggle/berpindah status kelas 'open'
+            envelopeWrapper.classList.toggle('open');
+
+            // Mengubah teks petunjuk
+            if (envelopeWrapper.classList.contains('open')) {
+                hintText.textContent = "Klik lagi untuk menutup";
+            } else {
+                hintText.textContent = "Klik amplop untuk membuka";
+            }
+        });
+    </script>
+
+</body>
+</html>
