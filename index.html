@@ -19,15 +19,16 @@
             align-items: center;
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow-x: hidden;
-            padding: 20px;
+            overflow-y: auto; /* Agar bisa di-scroll jika di layar HP kecil */
+            padding: 20px 10px;
         }
 
         /* Container Pembungkus */
         .wrapper {
             position: relative;
             cursor: pointer;
-            margin-top: 50px;
+            margin-top: 100px; /* Jarak atas aman agar surat tidak terpotong saat naik */
+            margin-bottom: 50px;
         }
 
         /* Tampilan Amplop */
@@ -79,11 +80,10 @@
             bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
-            width: 280px;
-            max-height: 80vh;
+            width: 270px;
             background: white;
             border-radius: 12px;
-            padding: 16px;
+            padding: 14px;
             text-align: center;
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
             transition: transform 0.6s ease-in-out, opacity 0.4s ease-in-out;
@@ -91,23 +91,21 @@
             opacity: 0;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             align-items: center;
-            overflow-y: auto;
         }
 
         .letter p {
             color: #333;
-            font-size: 14px;
-            line-height: 1.5;
-            margin-bottom: 10px;
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: 8px;
         }
 
         .letter .from {
             font-weight: bold;
             color: #d81b60;
             font-size: 13px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         /* Tombol Myself dengan Icon Foto */
@@ -117,7 +115,7 @@
             gap: 6px;
             background-color: #f8bbd0;
             color: #880e4f;
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
@@ -137,35 +135,33 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             animation: fadeIn 0.4s ease-in-out;
         }
 
         .photo-wrapper {
             width: 100%;
-            max-height: 220px;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
             border-radius: 8px;
             background-color: #fafafa;
         }
 
         .photo-container img {
-            width: 100%;
-            height: 100%;
-            max-height: 220px;
-            object-fit: contain; /* Memastikan foto penuh terlihat tanpa terpotong */
+            width: auto;
+            max-width: 100%;
+            max-height: 140px; /* Ukuran pas agar seluruh wajah & foto kelihatan utuh */
+            object-fit: contain;
             border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
         }
 
         .photo-caption {
             font-size: 11px;
             color: #777;
-            margin-top: 6px;
+            margin-top: 4px;
             font-style: italic;
         }
 
@@ -181,19 +177,19 @@
         }
 
         .wrapper.open .letter {
-            transform: translate(-50%, -140px);
+            transform: translate(-50%, -100px); /* Ketinggian disesuaikan agar pas di layar */
             opacity: 1;
-            z-index: 4; /* Berada di paling depan agar tidak tertutup lipatan amplop */
+            z-index: 4; /* Di paling depan agar tidak terhalang lipatan */
         }
 
         /* Petunjuk Tambahan */
         .hint {
             position: absolute;
-            bottom: -40px;
+            bottom: -35px;
             width: 100%;
             text-align: center;
             color: #888;
-            font-size: 14px;
+            font-size: 13px;
         }
     </style>
 </head>
@@ -241,7 +237,6 @@
 
         // Buka / Tutup Amplop
         envelopeWrapper.addEventListener('click', function(e) {
-            // Cegah amplop menutup jika tombol myself / foto yang diklik
             if (e.target.closest('#myselfBtn') || e.target.closest('#photoContainer')) return;
 
             envelopeWrapper.classList.toggle('open');
@@ -250,7 +245,6 @@
                 hintText.textContent = "Klik latar/amplop untuk menutup";
             } else {
                 hintText.textContent = "Klik amplop untuk membuka";
-                // Reset foto saat amplop ditutup
                 photoContainer.style.display = "none";
                 photoState = 0;
             }
@@ -258,14 +252,13 @@
 
         // Klik Tombol "Myself 📷"
         myselfBtn.addEventListener('click', function(e) {
-            e.stopPropagation(); // Mencegah memicu fungsi klik amplop
+            e.stopPropagation();
             if (photoState === 0) {
                 photoState = 1;
                 photoDisplay.src = photoBefore;
-                photoCaption.textContent = "Klik foto untuk lihat After (1/2)";
+                photoCaption.textContent = "Klik foto untuk ganti (1/2)";
                 photoContainer.style.display = "flex";
             } else {
-                // Sembunyikan foto jika tombol diklik lagi
                 photoContainer.style.display = "none";
                 photoState = 0;
             }
@@ -273,7 +266,7 @@
 
         // Klik pada Foto untuk berganti dari Before ke After
         photoDisplay.addEventListener('click', function(e) {
-            e.stopPropagation(); // Mencegah memicu fungsi klik amplop
+            e.stopPropagation();
             if (photoState === 1) {
                 photoState = 2;
                 photoDisplay.src = photoAfter;
