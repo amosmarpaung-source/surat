@@ -19,13 +19,15 @@
             align-items: center;
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
+            padding: 20px;
         }
 
         /* Container Pembungkus */
         .wrapper {
             position: relative;
             cursor: pointer;
+            margin-top: 50px;
         }
 
         /* Tampilan Amplop */
@@ -75,14 +77,15 @@
         .letter {
             position: absolute;
             bottom: 10px;
-            width: 270px;
-            height: auto;
-            min-height: 220px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 280px;
+            max-height: 80vh;
             background: white;
-            border-radius: 8px;
-            padding: 15px;
+            border-radius: 12px;
+            padding: 16px;
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
             transition: transform 0.6s ease-in-out, opacity 0.4s ease-in-out;
             z-index: 1;
             opacity: 0;
@@ -90,20 +93,21 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
+            overflow-y: auto;
         }
 
         .letter p {
             color: #333;
             font-size: 14px;
-            line-height: 1.4;
-            margin-bottom: 8px;
+            line-height: 1.5;
+            margin-bottom: 10px;
         }
 
         .letter .from {
             font-weight: bold;
             color: #d81b60;
             font-size: 13px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         /* Tombol Myself dengan Icon Foto */
@@ -113,7 +117,7 @@
             gap: 6px;
             background-color: #f8bbd0;
             color: #880e4f;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
@@ -133,23 +137,35 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .photo-wrapper {
+            width: 100%;
+            max-height: 220px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            border-radius: 8px;
+            background-color: #fafafa;
         }
 
         .photo-container img {
             width: 100%;
-            max-height: 180px;
-            object-fit: cover;
+            height: 100%;
+            max-height: 220px;
+            object-fit: contain; /* Memastikan foto penuh terlihat tanpa terpotong */
             border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
             cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .photo-caption {
             font-size: 11px;
             color: #777;
-            margin-top: 4px;
+            margin-top: 6px;
             font-style: italic;
         }
 
@@ -165,9 +181,9 @@
         }
 
         .wrapper.open .letter {
-            transform: translateY(-160px);
+            transform: translate(-50%, -140px);
             opacity: 1;
-            z-index: 2;
+            z-index: 4; /* Berada di paling depan agar tidak tertutup lipatan amplop */
         }
 
         /* Petunjuk Tambahan */
@@ -191,7 +207,9 @@
         <div class="letter" id="letterBox">
             <!-- Tempat Foto Muncul -->
             <div class="photo-container" id="photoContainer">
-                <img id="photoDisplay" src="" alt="Myself Photo">
+                <div class="photo-wrapper">
+                    <img id="photoDisplay" src="" alt="Myself Photo">
+                </div>
                 <span class="photo-caption" id="photoCaption">Klik foto untuk ganti</span>
             </div>
 
@@ -244,7 +262,7 @@
             if (photoState === 0) {
                 photoState = 1;
                 photoDisplay.src = photoBefore;
-                photoCaption.textContent = "Klik foto untuk ganti (Before ➔ After)";
+                photoCaption.textContent = "Klik foto untuk lihat After (1/2)";
                 photoContainer.style.display = "flex";
             } else {
                 // Sembunyikan foto jika tombol diklik lagi
@@ -259,11 +277,11 @@
             if (photoState === 1) {
                 photoState = 2;
                 photoDisplay.src = photoAfter;
-                photoCaption.textContent = "Foto After ✨";
+                photoCaption.textContent = "Foto After ✨ (2/2)";
             } else if (photoState === 2) {
                 photoState = 1;
                 photoDisplay.src = photoBefore;
-                photoCaption.textContent = "Foto Before 👈";
+                photoCaption.textContent = "Foto Before 👈 (1/2)";
             }
         });
     </script>
