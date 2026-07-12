@@ -75,11 +75,12 @@
         .letter {
             position: absolute;
             bottom: 10px;
-            width: 260px;
-            height: 180px;
+            width: 270px;
+            height: auto;
+            min-height: 220px;
             background: white;
             border-radius: 8px;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             transition: transform 0.6s ease-in-out, opacity 0.4s ease-in-out;
@@ -87,20 +88,74 @@
             opacity: 0;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .letter p {
             color: #333;
-            font-size: 15px;
-            line-height: 1.5;
-            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 8px;
         }
 
         .letter .from {
             font-weight: bold;
             color: #d81b60;
-            font-size: 14px;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        /* Tombol Myself dengan Icon Foto */
+        .photo-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #f8bbd0;
+            color: #880e4f;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+            user-select: none;
+        }
+
+        .photo-btn:hover {
+            background-color: #f48fb1;
+            transform: scale(1.05);
+        }
+
+        /* Kontainer Foto */
+        .photo-container {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .photo-container img {
+            width: 100%;
+            max-height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            cursor: pointer;
+        }
+
+        .photo-caption {
+            font-size: 11px;
+            color: #777;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         /* Efek Saat Amplop Di-klik (Terbuka) */
@@ -110,7 +165,7 @@
         }
 
         .wrapper.open .letter {
-            transform: translateY(-130px);
+            transform: translateY(-160px);
             opacity: 1;
             z-index: 2;
         }
@@ -133,9 +188,20 @@
         <div class="envelope">
             <span class="envelope-text">For: RARA</span>
         </div>
-        <div class="letter">
+        <div class="letter" id="letterBox">
+            <!-- Tempat Foto Muncul -->
+            <div class="photo-container" id="photoContainer">
+                <img id="photoDisplay" src="" alt="Myself Photo">
+                <span class="photo-caption" id="photoCaption">Klik foto untuk ganti</span>
+            </div>
+
             <p>Semoga sakitnya cepat sembuh ya buat RARA, tetap semangat! Tuhan Yesus memberkati.</p>
             <div class="from">From: Yowelll</div>
+
+            <!-- Tombol Icon Myself -->
+            <div class="photo-btn" id="myselfBtn">
+                📷 <span>Myself</span>
+            </div>
         </div>
         <div class="hint" id="hintText">Klik amplop untuk membuka</div>
     </div>
@@ -143,17 +209,61 @@
     <script>
         const envelopeWrapper = document.getElementById('envelopeWrapper');
         const hintText = document.getElementById('hintText');
+        const letterBox = document.getElementById('letterBox');
+        const myselfBtn = document.getElementById('myselfBtn');
+        const photoContainer = document.getElementById('photoContainer');
+        const photoDisplay = document.getElementById('photoDisplay');
+        const photoCaption = document.getElementById('photoCaption');
 
-        // Menambahkan alur saat amplop diklik
-        envelopeWrapper.addEventListener('click', function() {
-            // Toggle/berpindah status kelas 'open'
+        // Nama file sesuai foto di folder kamu
+        const photoBefore = "rara1.jpeg";
+        const photoAfter = "rara2.jpeg";
+
+        let photoState = 0; // 0: tersembunyi, 1: photo 1 (before), 2: photo 2 (after)
+
+        // Buka / Tutup Amplop
+        envelopeWrapper.addEventListener('click', function(e) {
+            // Cegah amplop menutup jika tombol myself / foto yang diklik
+            if (e.target.closest('#myselfBtn') || e.target.closest('#photoContainer')) return;
+
             envelopeWrapper.classList.toggle('open');
 
-            // Mengubah teks petunjuk
             if (envelopeWrapper.classList.contains('open')) {
-                hintText.textContent = "Klik lagi untuk menutup";
+                hintText.textContent = "Klik latar/amplop untuk menutup";
             } else {
                 hintText.textContent = "Klik amplop untuk membuka";
+                // Reset foto saat amplop ditutup
+                photoContainer.style.display = "none";
+                photoState = 0;
+            }
+        });
+
+        // Klik Tombol "Myself 📷"
+        myselfBtn.addEventListener('click', function(e) {
+            e.stopPropagation(); // Mencegah memicu fungsi klik amplop
+            if (photoState === 0) {
+                photoState = 1;
+                photoDisplay.src = photoBefore;
+                photoCaption.textContent = "Klik foto untuk ganti (Before ➔ After)";
+                photoContainer.style.display = "flex";
+            } else {
+                // Sembunyikan foto jika tombol diklik lagi
+                photoContainer.style.display = "none";
+                photoState = 0;
+            }
+        });
+
+        // Klik pada Foto untuk berganti dari Before ke After
+        photoDisplay.addEventListener('click', function(e) {
+            e.stopPropagation(); // Mencegah memicu fungsi klik amplop
+            if (photoState === 1) {
+                photoState = 2;
+                photoDisplay.src = photoAfter;
+                photoCaption.textContent = "Foto After ✨";
+            } else if (photoState === 2) {
+                photoState = 1;
+                photoDisplay.src = photoBefore;
+                photoCaption.textContent = "Foto Before 👈";
             }
         });
     </script>
