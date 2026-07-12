@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surat Untuk RARA</title>
     
+    <!-- Pustaka Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -15,107 +18,136 @@
         body {
             background-color: #fce4ec;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow-y: auto; /* Agar bisa di-scroll jika di layar HP kecil */
-            padding: 20px 10px;
+            overflow-x: hidden;
+            padding: 30px 10px 80px 10px;
         }
 
-        /* Container Pembungkus */
+        /* ------------------ INTRUKSI UTAMA DI ATAS AMPLOP ------------------ */
+        .top-instruction {
+            color: #d81b60;
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            background: #fff0f5;
+            padding: 8px 18px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(216, 27, 96, 0.15);
+            border: 1px solid #f8bbd0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        /* ------------------ CONTAINER AMPLOP & SURAT ------------------ */
         .wrapper {
             position: relative;
             cursor: pointer;
-            margin-top: 100px; /* Jarak atas aman agar surat tidak terpotong saat naik */
-            margin-bottom: 50px;
+            margin-top: 20px;
+            margin-bottom: 40px; 
+            transition: margin-top 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* Tampilan Amplop */
+        .wrapper.open {
+            margin-top: 360px; 
+        }
+
         .envelope {
             width: 300px;
-            height: 200px;
+            height: 170px;
             background-color: #f48fb1;
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
             position: relative;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-end;
+            padding-bottom: 25px;
             transition: transform 0.3s;
+            overflow: visible;
         }
 
         .wrapper:hover .envelope {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
         }
 
-        /* Lipatan Atas Amplop */
+        /* LIPATAN AMPLOP */
         .flap {
             position: absolute;
             top: 0;
+            left: 0;
             width: 0;
             height: 0;
             border-left: 150px solid transparent;
             border-right: 150px solid transparent;
-            border-top: 110px solid #f06292;
+            border-top: 90px solid #f06292;
             transform-origin: top;
             transition: transform 0.5s ease-in-out;
-            z-index: 3;
-        }
-
-        /* Tulisan di Depan Amplop */
-        .envelope-text {
-            color: white;
-            font-weight: bold;
-            font-size: 20px;
             z-index: 2;
-            margin-top: 40px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
 
-        /* Tampilan Surat (Tersembunyi di dalam Amplop) */
+        /* TEKS AMPLOP */
+        .envelope-text {
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 20px;
+            z-index: 10;
+            text-shadow: 1px 2px 4px rgba(0,0,0,0.25);
+            letter-spacing: 1px;
+            pointer-events: none;
+        }
+
+        /* SURAT PRESISI TAMPIL UTUH TANPA TERPOTONG */
         .letter {
             position: absolute;
-            bottom: 10px;
+            top: 0px;
             left: 50%;
-            transform: translateX(-50%);
-            width: 270px;
+            transform: translateX(-50%) scale(0.9);
+            width: 290px;
             background: white;
-            border-radius: 12px;
-            padding: 14px;
+            border-radius: 16px;
+            padding: 18px;
             text-align: center;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            transition: transform 0.6s ease-in-out, opacity 0.4s ease-in-out;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.25), opacity 0.4s ease-in-out;
             z-index: 1;
             opacity: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            pointer-events: none;
         }
 
         .letter p {
             color: #333;
             font-size: 13px;
-            line-height: 1.4;
-            margin-bottom: 8px;
+            line-height: 1.5;
+            margin-bottom: 10px;
         }
 
         .letter .from {
             font-weight: bold;
             color: #d81b60;
             font-size: 13px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
-        /* Tombol Myself dengan Icon Foto */
         .photo-btn {
             display: inline-flex;
             align-items: center;
             gap: 6px;
             background-color: #f8bbd0;
             color: #880e4f;
-            padding: 6px 14px;
+            padding: 7px 16px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
@@ -129,7 +161,6 @@
             transform: scale(1.05);
         }
 
-        /* Kontainer Foto */
         .photo-container {
             width: 100%;
             display: none;
@@ -144,18 +175,19 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 8px;
+            border-radius: 10px;
             background-color: #fafafa;
+            overflow: hidden;
+            border: 1px solid #f8bbd0;
         }
 
         .photo-container img {
-            width: auto;
-            max-width: 100%;
-            max-height: 140px; /* Ukuran pas agar seluruh wajah & foto kelihatan utuh */
+            width: 100%;
+            height: auto;
+            max-height: 170px;
             object-fit: contain;
             border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
         }
 
         .photo-caption {
@@ -170,38 +202,307 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        /* Efek Saat Amplop Di-klik (Terbuka) */
         .wrapper.open .flap {
             transform: rotateX(180deg);
             z-index: 1;
         }
 
         .wrapper.open .letter {
-            transform: translate(-50%, -100px); /* Ketinggian disesuaikan agar pas di layar */
+            transform: translate(-50%, -105%) scale(1); 
             opacity: 1;
-            z-index: 4; /* Di paling depan agar tidak terhalang lipatan */
+            z-index: 9999;
+            pointer-events: auto;
         }
 
-        /* Petunjuk Tambahan */
         .hint {
             position: absolute;
-            bottom: -35px;
+            bottom: -28px;
             width: 100%;
             text-align: center;
-            color: #888;
+            color: #777;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* ------------------ ARENA GAME KOREK & BOM ------------------ */
+        .game-area {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            user-select: none;
+            margin-top: 20px;
+        }
+
+        .game-instruction {
             font-size: 13px;
+            font-weight: bold;
+            color: #c2185b;
+            background: #ffffff;
+            padding: 8px 18px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #f8bbd0;
+            text-align: center;
+        }
+
+        .interactive-container {
+            position: relative;
+            width: 320px;
+            height: 140px;
+            background: rgba(255, 255, 255, 0.75);
+            border: 2px dashed #f48fb1;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        /* BOM & SUMBU 3D */
+        .bomb-wrapper {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .bomb-body {
+            width: 65px;
+            height: 65px;
+            background: radial-gradient(circle at 25px 25px, #555, #111 80%);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            transition: transform 3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s;
+        }
+
+        .bomb-cap {
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 8px;
+            background: #333;
+            border-radius: 3px;
+            border-bottom: 2px solid #000;
+        }
+
+        .fuse-rope {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            width: 22px;
+            height: 22px;
+            border-top: 4px solid #8d6e63;
+            border-right: 4px solid #8d6e63;
+            border-top-right-radius: 18px;
+            transform: rotate(-10deg);
+        }
+
+        .spark-fire {
+            display: none;
+            position: absolute;
+            top: -10px;
+            right: -8px;
+            font-size: 16px;
+            animation: sparkAnim 0.15s infinite alternate;
+        }
+
+        @keyframes sparkAnim {
+            from { transform: scale(0.8) rotate(0deg); opacity: 1; }
+            to { transform: scale(1.3) rotate(20deg); opacity: 0.7; }
+        }
+
+        .bomb-body.growing {
+            transform: scale(1.6);
+        }
+
+        /* KOTAK KOREK & BATANG KOREK */
+        .match-box {
+            width: 60px;
+            height: 80px;
+            background: linear-gradient(135deg, #e64a19, #d84315);
+            border-radius: 8px;
+            border-right: 8px solid #3e2723;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+            padding: 4px;
+        }
+
+        .match-stick {
+            width: 10px;
+            height: 65px;
+            background: #d7ccc8;
+            border-radius: 3px;
+            position: absolute;
+            cursor: grab;
+            touch-action: none;
+            z-index: 30;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        }
+
+        .match-head {
+            width: 12px;
+            height: 15px;
+            background: #b71c1c;
+            border-radius: 50% 50% 30% 30%;
+            position: absolute;
+            top: -5px;
+            left: -1px;
+        }
+
+        .match-flame {
+            display: none;
+            position: absolute;
+            top: -20px;
+            left: -4px;
+            font-size: 18px;
+            animation: flicker 0.15s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(0.9) rotate(-3deg); }
+            100% { transform: scale(1.2) rotate(3deg); }
+        }
+
+        /* ANIMASI BUNGA MELAYANG */
+        .floating-flower {
+            position: fixed;
+            z-index: 99999;
+            pointer-events: none;
+            user-select: none;
+            animation: floatUp 3.5s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(0.5) rotate(0deg);
+            }
+            50% {
+                opacity: 0.9;
+                transform: translate(var(--vx), -200px) scale(1.4) rotate(180deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(calc(var(--vx) * 1.5), -450px) scale(1.8) rotate(360deg);
+            }
+        }
+
+        /* ------------------ OVERLAY BLUR HITAM & BUNGA BESAR ------------------ */
+        .dark-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 5, 12, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.2s ease;
+        }
+
+        .dark-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .big-flower {
+            font-size: 110px;
+            line-height: 1;
+            filter: drop-shadow(0 0 25px rgba(255, 105, 180, 0.8));
+            transform: scale(0);
+            transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .dark-overlay.active .big-flower {
+            transform: scale(1);
+            animation: gentlePulse 3s infinite alternate ease-in-out 1.2s;
+        }
+
+        .flower-text {
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 800;
+            text-align: center;
+            margin-top: 20px;
+            padding: 0 25px;
+            text-shadow: 0 0 15px rgba(244, 143, 177, 0.8);
+            letter-spacing: 1px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease 0.6s;
+        }
+
+        .dark-overlay.active .flower-text {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .close-overlay-btn {
+            margin-top: 35px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 8px 22px;
+            border-radius: 25px;
+            font-size: 13px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: all 0.5s ease 1.5s;
+        }
+
+        .dark-overlay.active .close-overlay-btn {
+            opacity: 1;
+        }
+
+        .close-overlay-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(1.05);
+        }
+
+        @keyframes gentlePulse {
+            0% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1.12) rotate(6deg); }
         }
     </style>
 </head>
 <body>
 
+    <!-- INTRUKSI DI ATAS AMPLOP -->
+    <div class="top-instruction" id="topInstruction">
+        ✉️ Buka amplop terlebih dahulu ya!
+    </div>
+
+    <!-- CONTAINER AMPLOP -->
     <div class="wrapper" id="envelopeWrapper">
         <div class="flap"></div>
         <div class="envelope">
             <span class="envelope-text">For: RARA</span>
         </div>
+        
+        <!-- SURAT -->
         <div class="letter" id="letterBox">
-            <!-- Tempat Foto Muncul -->
             <div class="photo-container" id="photoContainer">
                 <div class="photo-wrapper">
                     <img id="photoDisplay" src="" alt="Myself Photo">
@@ -212,37 +513,77 @@
             <p>Semoga sakitnya cepat sembuh ya buat RARA, tetap semangat! Tuhan Yesus memberkati.</p>
             <div class="from">From: Yowelll</div>
 
-            <!-- Tombol Icon Myself -->
             <div class="photo-btn" id="myselfBtn">
                 📷 <span>Myself</span>
             </div>
         </div>
+        
         <div class="hint" id="hintText">Klik amplop untuk membuka</div>
     </div>
 
+    <!-- ARENA GAME KOREK & BOM -->
+    <div class="game-area">
+        <div class="game-instruction" id="gameInstruction">
+            Geser korek ke kotak merah untuk menyalakan!
+        </div>
+        
+        <div class="interactive-container">
+            <!-- Kotak Korek -->
+            <div class="match-box" id="matchBox">GESEK SINI</div>
+
+            <!-- Batang Korek Dragable -->
+            <div class="match-stick" id="matchStick" style="right: 35px; top: 35px;">
+                <div class="match-head"></div>
+                <div class="match-flame" id="matchFlame">🔥</div>
+            </div>
+
+            <!-- Objek Bom 3D -->
+            <div class="bomb-wrapper" id="bombWrapper">
+                <div class="bomb-body" id="bombBody">
+                    <div class="bomb-cap"></div>
+                    <div class="fuse-rope" id="fuseRope">
+                        <div class="spark-fire" id="sparkFire">💥</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OVERLAY NGEBLUR HITAM DAN BUNGA BESAR -->
+    <div class="dark-overlay" id="darkOverlay">
+        <div class="big-flower">🌺</div>
+        <div class="flower-text">Bunga Indah Khusus Buat RARA ✨</div>
+        <button class="close-overlay-btn" id="closeOverlayBtn">Tutup</button>
+    </div>
+
     <script>
+        // --- LOGIK AMPLOP & FOTO ---
         const envelopeWrapper = document.getElementById('envelopeWrapper');
         const hintText = document.getElementById('hintText');
-        const letterBox = document.getElementById('letterBox');
-        const myselfBtn = document.getElementById('myselfBtn');
         const photoContainer = document.getElementById('photoContainer');
         const photoDisplay = document.getElementById('photoDisplay');
         const photoCaption = document.getElementById('photoCaption');
+        const myselfBtn = document.getElementById('myselfBtn');
 
-        // Nama file sesuai foto di folder kamu
         const photoBefore = "rara1.jpeg";
         const photoAfter = "rara2.jpeg";
+        let photoState = 0;
 
-        let photoState = 0; // 0: tersembunyi, 1: photo 1 (before), 2: photo 2 (after)
-
-        // Buka / Tutup Amplop
         envelopeWrapper.addEventListener('click', function(e) {
             if (e.target.closest('#myselfBtn') || e.target.closest('#photoContainer')) return;
-
+            
             envelopeWrapper.classList.toggle('open');
-
+            
             if (envelopeWrapper.classList.contains('open')) {
                 hintText.textContent = "Klik latar/amplop untuk menutup";
+                
+                setTimeout(() => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                }, 200);
+
             } else {
                 hintText.textContent = "Klik amplop untuk membuka";
                 photoContainer.style.display = "none";
@@ -250,7 +591,6 @@
             }
         });
 
-        // Klik Tombol "Myself 📷"
         myselfBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             if (photoState === 0) {
@@ -264,7 +604,6 @@
             }
         });
 
-        // Klik pada Foto untuk berganti dari Before ke After
         photoDisplay.addEventListener('click', function(e) {
             e.stopPropagation();
             if (photoState === 1) {
@@ -277,7 +616,173 @@
                 photoCaption.textContent = "Foto Before 👈 (1/2)";
             }
         });
-    </script>
 
+        // --- LOGIK DRAG KOREK & BOM MEMBESAR ---
+        const matchStick = document.getElementById('matchStick');
+        const matchBox = document.getElementById('matchBox');
+        const matchFlame = document.getElementById('matchFlame');
+        const fuseRope = document.getElementById('fuseRope');
+        const sparkFire = document.getElementById('sparkFire');
+        const bombBody = document.getElementById('bombBody');
+        const gameInstruction = document.getElementById('gameInstruction');
+        const darkOverlay = document.getElementById('darkOverlay');
+        const closeOverlayBtn = document.getElementById('closeOverlayBtn');
+
+        let isLit = false;
+        let fuseLit = false;
+        let matchTimer = null;
+
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        matchStick.addEventListener('mousedown', startDrag);
+        matchStick.addEventListener('touchstart', startDrag, {passive: false});
+
+        function startDrag(e) {
+            if (fuseLit) return;
+            isDragging = true;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            const rect = matchStick.getBoundingClientRect();
+            offsetX = clientX - rect.left;
+            offsetY = clientY - rect.top;
+
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('touchmove', onDrag, {passive: false});
+            document.addEventListener('mouseup', stopDrag);
+            document.addEventListener('touchend', stopDrag);
+        }
+
+        function onDrag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            const containerRect = document.querySelector('.interactive-container').getBoundingClientRect();
+            let x = clientX - containerRect.left - offsetX;
+            let y = clientY - containerRect.top - offsetY;
+
+            matchStick.style.left = x + 'px';
+            matchStick.style.top = y + 'px';
+
+            const matchRect = matchStick.getBoundingClientRect();
+            const boxRect = matchBox.getBoundingClientRect();
+
+            if (!isLit && checkCollision(matchRect, boxRect)) {
+                lightMatch();
+            }
+
+            const fuseRect = fuseRope.getBoundingClientRect();
+            if (isLit && !fuseLit && checkCollision(matchRect, fuseRect)) {
+                lightFuse();
+            }
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', onDrag);
+            document.removeEventListener('touchmove', onDrag);
+        }
+
+        function checkCollision(rect1, rect2) {
+            return !(rect1.right < rect2.left || 
+                     rect1.left > rect2.right || 
+                     rect1.bottom < rect2.top || 
+                     rect1.top > rect2.bottom);
+        }
+
+        // 1. Menyalakan Korek
+        function lightMatch() {
+            isLit = true;
+            matchFlame.style.display = "block";
+            gameInstruction.textContent = "Korek menyala! Cepat bakarkan ke sumbu bom! (3s)";
+
+            matchTimer = setTimeout(() => {
+                if (!fuseLit) {
+                    isLit = false;
+                    matchFlame.style.display = "none";
+                    gameInstruction.textContent = "Api padam! Gesek korek lagi.";
+                }
+            }, 3000);
+        }
+
+        // 2. Bakar Sumbu & Bom Membesar Otomatis
+        function lightFuse() {
+            fuseLit = true;
+            clearTimeout(matchTimer);
+            sparkFire.style.display = "block";
+            gameInstruction.textContent = "Sumbu terbakar! Bom siap meledak dalam 3 detik... 💣";
+
+            bombBody.classList.add('growing');
+
+            setTimeout(() => {
+                explodeFlowers();
+            }, 3000);
+        }
+
+        // 3. LEDAKAN SEMBURAN BUNGA + OVERLAY HITAM BLUR
+        function explodeFlowers() {
+            sparkFire.style.display = "none";
+            matchFlame.style.display = "none";
+            bombBody.style.opacity = "0";
+
+            // Semburan Confetti
+            confetti({
+                particleCount: 120,
+                spread: 100,
+                origin: { y: 0.7 },
+                colors: ['#f48fb1', '#d81b60', '#ff80ab', '#ffb74d', '#ffffff']
+            });
+
+            // Munculkan Semburan Bunga Melayang
+            const flowersList = ['🌸', '🌺', '🌷', '🌹', '🌻', '💐', '✨'];
+            const bombRect = bombBody.getBoundingClientRect();
+            const startX = bombRect.left + (bombRect.width / 2);
+            const startY = bombRect.top;
+
+            let flowerCount = 0;
+            const flowerInterval = setInterval(() => {
+                createFlowerElement(startX, startY, flowersList);
+                flowerCount++;
+                if (flowerCount > 40) {
+                    clearInterval(flowerInterval);
+                    gameInstruction.textContent = "Bunga yang indah untuk RARA ✨🌸";
+                    
+                    // TAMPILKAN OVERLAY BLUR HITAM & BUNGA BESAR SETELAH SEMBURAN
+                    setTimeout(() => {
+                        darkOverlay.classList.add('active');
+                    }, 800);
+                }
+            }, 50);
+        }
+
+        function createFlowerElement(x, y, list) {
+            const el = document.createElement('div');
+            el.className = 'floating-flower';
+            el.textContent = list[Math.floor(Math.random() * list.length)];
+            
+            const randomXOffset = (Math.random() - 0.5) * 160;
+            const randomSize = Math.floor(Math.random() * 18) + 22;
+            const vx = (Math.random() - 0.5) * 300;
+
+            el.style.left = (x + randomXOffset) + 'px';
+            el.style.top = y + 'px';
+            el.style.fontSize = randomSize + 'px';
+            el.style.setProperty('--vx', vx + 'px');
+
+            document.body.appendChild(el);
+
+            setTimeout(() => {
+                el.remove();
+            }, 3500);
+        }
+
+        // Tombol Tutup Overlay
+        closeOverlayBtn.addEventListener('click', function() {
+            darkOverlay.classList.remove('active');
+        });
+    </script>
 </body>
 </html>
