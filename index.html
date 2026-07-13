@@ -673,131 +673,68 @@
     </div>
 
     <script>
-        // --- SISTEM SUARA HYBRID HP (FILE AUDIO + DIGITAL SYNTHESIZER FALLBACK) ---
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx = null;
-
-        function initAudioCtx() {
-            if (!audioCtx) {
-                audioCtx = new AudioContext();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }
-
-        // Jalankan multi-file loader untuk cegah issue extension .mp3 / .mp3.mp3
-        const audioFiles = {
-            fire: ['fire_sound.mp3', 'fire_sound.mp3.mp3'],
-            timer: ['timer_sound.mp3', 'timer_sound.mp3.mp3'],
-            explosion: ['explosion_sound.mp3', 'explosion_sound.mp3.mp3'],
-            bloop: ['bloop_sound.mp3', 'bloop_sound.mp3.mp3'],
-            cover: ['cover.mp3']
+        // --- SISTEM MANAGEMENT AUDIO ULTRA BERSIH & JERNIH ---
+        const audioList = {
+            fire: 'fire_sound.mp3',
+            timer: 'timer_sound.mp3',
+            explosion: 'explosion_sound.mp3',
+            bloop: 'bloop_sound.mp3',
+            cover: 'cover.mp3'
         };
 
-        const sounds = {};
+        const soundElements = {};
+        let isAudioUnlocked = false;
 
-        // Inisialisasi Audio Element
-        Object.keys(audioFiles).forEach(key => {
-            sounds[key] = new Audio();
-            sounds[key].src = audioFiles[key][0];
-            sounds[key].preload = 'auto';
+        // Inisialisasi audio standar tanpa fetch (Aman dari CORS lokal laptop)
+        Object.keys(audioList).forEach(key => {
+            const audio = new Audio(audioList[key]);
+            audio.preload = 'auto';
+            if (key === 'timer') {
+                audio.loop = true; // Timer berdetak berulang
+            }
+            soundElements[key] = audio;
         });
 
-        // Autoplay Unlocker Khusus HP (iPhone/Android)
-        let isUnlocked = false;
-        function unlockAudioHP() {
-            if (isUnlocked) return;
-            initAudioCtx();
-
-            Object.keys(sounds).forEach(key => {
-                if (key !== 'cover') {
-                    sounds[key].play().then(() => {
-                        sounds[key].pause();
-                        sounds[key].currentTime = 0;
-                    }).catch(() => {
-                        // Jika nama file pertama gagal, coba nama file alternatif (.mp3.mp3)
-                        if (audioFiles[key][1]) {
-                            sounds[key].src = audioFiles[key][1];
-                            sounds[key].load();
-                        }
-                    });
-                }
+        // Buka izin pemutaran audio di HP & Laptop saat ada sentuhan/klik pertama
+        function unlockAudio() {
+            if (isAudioUnlocked) return;
+            Object.keys(soundElements).forEach(key => {
+                const snd = soundElements[key];
+                snd.play().then(() => {
+                    snd.pause();
+                    snd.currentTime = 0;
+                }).catch(() => {});
             });
-            isUnlocked = true;
+            isAudioUnlocked = true;
         }
 
-        document.addEventListener('touchstart', unlockAudioHP, { once: true });
-        document.addEventListener('click', unlockAudioHP, { once: true });
+        ['click', 'touchstart', 'mousedown'].forEach(evt => {
+            document.addEventListener(evt, unlockAudio, { once: true });
+        });
 
-        // Deringkan Suara Efek (Dengan fallback digital jika file audio di GitHub bermasalah)
-        function playSound(type) {
-            initAudioCtx();
-            const snd = sounds[type];
-            let played = false;
-
-            if (snd && snd.src) {
-                snd.currentTime = 0;
-                let promise = snd.play();
-                if (promise !== undefined) {
-                    promise.then(() => { played = true; }).catch(err => {
-                        playSynthSound(type); // Gunakan suara digital jika file diblokir browser HP
-                    });
+        // Fungsi Memutar Suara dengan Duplikasi Cepat (Jernih & Tanpa Rusak)
+        function playSound(key) {
+            if (!soundElements[key]) return;
+            
+            try {
+                if (key === 'bloop' || key === 'fire') {
+                    // Clone node agar suara pendek tidak saling memotong/bergetar
+                    const tempSound = soundElements[key].cloneNode();
+                    tempSound.volume = 1.0;
+                    tempSound.play().catch(() => {});
+                } else {
+                    const sound = soundElements[key];
+                    sound.currentTime = 0;
+                    sound.volume = 1.0;
+                    sound.play().catch(() => {});
                 }
-            } else {
-                playSynthSound(type);
-            }
+            } catch (e) {}
         }
 
-        function stopSound(type) {
-            const snd = sounds[type];
-            if (snd) {
-                snd.pause();
-                snd.currentTime = 0;
-            }
-        }
-
-        // GENERATOR SUARA DIGITAL EFESISIEN BILA FILE MP3 GAGAL DIMUAT DI HP
-        function playSynthSound(type) {
-            if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            const now = audioCtx.currentTime;
-
-            if (type === 'fire') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.3);
-                osc.start(now);
-                osc.stop(now + 0.3);
-            } else if (type === 'timer') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, now);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.1);
-                osc.start(now);
-                osc.stop(now + 0.1);
-            } else if (type === 'explosion') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(100, now);
-                osc.frequency.exponentialRampToValueAtTime(20, now + 0.8);
-                gain.gain.setValueAtTime(0.6, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.8);
-                osc.start(now);
-                osc.stop(now + 0.8);
-            } else if (type === 'bloop') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(300, now);
-                osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
-                gain.gain.setValueAtTime(0.4, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.15);
-                osc.start(now);
-                osc.stop(now + 0.15);
+        function stopSound(key) {
+            if (soundElements[key]) {
+                soundElements[key].pause();
+                soundElements[key].currentTime = 0;
             }
         }
 
@@ -806,20 +743,23 @@
         let noteBurstInterval = null;
 
         startCoverBtn.addEventListener('click', function() {
-            initAudioCtx();
-            if (sounds.cover.paused) {
-                sounds.cover.play().catch(e => alert("Gagal memutar cover.mp3, pastikan file cover.mp3 ada di repository!"));
-                startCoverBtn.innerHTML = '<span>⏸️</span> <span>Hentikan lagu</span>';
-                startNoteBurst();
+            unlockAudio();
+            const coverAudio = soundElements.cover;
+
+            if (coverAudio.paused) {
+                coverAudio.play().then(() => {
+                    startCoverBtn.innerHTML = '<span>⏸️</span> <span>Hentikan lagu</span>';
+                    startNoteBurst();
+                }).catch(e => alert("File cover.mp3 tidak ditemukan di folder lokal Anda!"));
             } else {
-                sounds.cover.pause();
-                sounds.cover.currentTime = 0;
+                coverAudio.pause();
+                coverAudio.currentTime = 0;
                 startCoverBtn.innerHTML = '<span>▶️</span> <span>aku cover lagu buat mu</span>';
                 stopNoteBurst();
             }
         });
 
-        sounds.cover.addEventListener('ended', function() {
+        soundElements.cover.addEventListener('ended', function() {
             startCoverBtn.innerHTML = '<span>▶️</span> <span>aku cover lagu buat mu</span>';
             stopNoteBurst();
         });
@@ -1094,7 +1034,7 @@
 
         closeOverlayBtn.addEventListener('click', function() {
             darkOverlay.classList.remove('active');
-            sounds.cover.pause();
+            stopSound('cover');
             stopNoteBurst();
             startCoverBtn.innerHTML = '<span>▶️</span> <span>aku cover lagu buat mu</span>';
         });
