@@ -24,14 +24,16 @@
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow-x: hidden;
-            padding: 30px 10px 80px 10px;
+            padding: 20px 10px 80px 10px;
+            position: relative;
         }
 
-        /* ------------------ INTRUKSI UTAMA DI ATAS AMPLOP ------------------ */
+        /* INTRUKSI UTAMA DI ATAS AMPLOP */
         .top-instruction {
             color: #d81b60;
             font-weight: bold;
-            font-size: 15px;
+            font-size: 14px;
+            margin-top: 20px;
             margin-bottom: 20px;
             text-align: center;
             background: #fff0f5;
@@ -47,11 +49,11 @@
             50% { transform: scale(1.03); }
         }
 
-        /* ------------------ CONTAINER AMPLOP & SURAT ------------------ */
+        /* CONTAINER AMPLOP & SURAT */
         .wrapper {
             position: relative;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 10px;
             margin-bottom: 40px; 
             transition: margin-top 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         }
@@ -80,7 +82,6 @@
             transform: translateY(-3px);
         }
 
-        /* LIPATAN AMPLOP */
         .flap {
             position: absolute;
             top: 0;
@@ -95,7 +96,6 @@
             z-index: 2;
         }
 
-        /* TEKS AMPLOP */
         .envelope-text {
             color: #ffffff;
             font-weight: 800;
@@ -106,7 +106,6 @@
             pointer-events: none;
         }
 
-        /* SURAT PRESISI TAMPIL UTUH TANPA TERPOTONG */
         .letter {
             position: absolute;
             top: 0px;
@@ -224,7 +223,7 @@
             font-weight: 500;
         }
 
-        /* ------------------ ARENA GAME KOREK & BOM ------------------ */
+        /* ARENA GAME KOREK & BOM */
         .game-area {
             position: relative;
             z-index: 5;
@@ -261,7 +260,6 @@
             backdrop-filter: blur(5px);
         }
 
-        /* BOM & SUMBU 3D */
         .bomb-wrapper {
             position: relative;
             width: 90px;
@@ -323,7 +321,6 @@
             transform: scale(1.6);
         }
 
-        /* KOTAK KOREK & BATANG KOREK */
         .match-box {
             width: 60px;
             height: 80px;
@@ -377,8 +374,8 @@
             100% { transform: scale(1.2) rotate(3deg); }
         }
 
-        /* ANIMASI BUNGA MELAYANG */
-        .floating-flower {
+        /* ANIMASI BUNGA & NOT MUSIK MELAYANG */
+        .floating-flower, .floating-note {
             position: fixed;
             z-index: 99999;
             pointer-events: none;
@@ -393,15 +390,15 @@
             }
             50% {
                 opacity: 0.9;
-                transform: translate(var(--vx), -200px) scale(1.4) rotate(180deg);
+                transform: translate(var(--vx), -200px) scale(1.3) rotate(180deg);
             }
             100% {
                 opacity: 0;
-                transform: translate(calc(var(--vx) * 1.5), -450px) scale(1.8) rotate(360deg);
+                transform: translate(calc(var(--vx) * 1.5), -450px) scale(1.6) rotate(360deg);
             }
         }
 
-        /* ------------------ OVERLAY BLUR HITAM & BUNGA BESAR ------------------ */
+        /* OVERLAY AKHIR & ARENA STIKER */
         .dark-overlay {
             position: fixed;
             top: 0;
@@ -426,12 +423,61 @@
             pointer-events: auto;
         }
 
+        /* TOMBOL START MUSIC DI ATAS BUNGA */
+        .music-start-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #ff4081, #d81b60);
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(216, 27, 96, 0.6);
+            margin-bottom: 25px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.8s ease 0.4s;
+            user-select: none;
+        }
+
+        .dark-overlay.active .music-start-btn {
+            opacity: 1;
+            transform: translateY(0);
+            animation: pulseBtn 1.8s infinite alternate ease-in-out 1.2s;
+        }
+
+        @keyframes pulseBtn {
+            0% { transform: scale(1); box-shadow: 0 6px 20px rgba(216, 27, 96, 0.6); }
+            100% { transform: scale(1.08); box-shadow: 0 10px 28px rgba(255, 64, 129, 0.9); }
+        }
+
+        .music-start-btn:hover {
+            transform: scale(1.1) !important;
+            background: linear-gradient(135deg, #ff79b0, #ff4081);
+        }
+
+        /* WRAPPER BUNGA DAN STIKER KANAN-KIRI */
+        .flower-sticker-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
         .big-flower {
             font-size: 110px;
             line-height: 1;
             filter: drop-shadow(0 0 25px rgba(255, 105, 180, 0.8));
             transform: scale(0);
             transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            user-select: none;
+            z-index: 2;
         }
 
         .dark-overlay.active .big-flower {
@@ -439,12 +485,62 @@
             animation: gentlePulse 3s infinite alternate ease-in-out 1.2s;
         }
 
+        /* STIKER BULAT KECIL DI SEBELAH BUNGA */
+        .side-sticker {
+            position: absolute;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            border: 3px solid #ffffff;
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.5);
+            object-fit: cover;
+            opacity: 0;
+            transform: scale(0);
+            transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 1s ease;
+            z-index: 3;
+        }
+
+        .side-sticker.left {
+            left: -50px;
+            animation: floatStickerLeft 2.5s infinite alternate ease-in-out;
+        }
+
+        .side-sticker.right {
+            right: -50px;
+            animation: floatStickerRight 2.5s infinite alternate ease-in-out;
+        }
+
+        .dark-overlay.active .side-sticker {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        @keyframes floatStickerLeft {
+            0% { transform: translateY(0px) rotate(-8deg); }
+            100% { transform: translateY(-10px) rotate(-15deg); }
+        }
+
+        @keyframes floatStickerRight {
+            0% { transform: translateY(0px) rotate(8deg); }
+            100% { transform: translateY(-10px) rotate(15deg); }
+        }
+
+        .big-flower.blooped {
+            animation: bloopAnim 0.3s ease-in-out !important;
+        }
+
+        @keyframes bloopAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1); }
+        }
+
         .flower-text {
             color: #ffffff;
             font-size: 22px;
             font-weight: 800;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 15px;
             padding: 0 25px;
             text-shadow: 0 0 15px rgba(244, 143, 177, 0.8);
             letter-spacing: 1px;
@@ -453,13 +549,29 @@
             transition: all 1s ease 0.6s;
         }
 
-        .dark-overlay.active .flower-text {
+        .click-hint-text {
+            color: #ff80ab;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 8px;
+            opacity: 0;
+            transition: all 1s ease 0.8s;
+            animation: pulseHint 1.5s infinite alternate;
+        }
+
+        @keyframes pulseHint {
+            from { transform: scale(0.95); opacity: 0.8; }
+            to { transform: scale(1.05); opacity: 1; }
+        }
+
+        .dark-overlay.active .flower-text,
+        .dark-overlay.active .click-hint-text {
             opacity: 1;
             transform: translateY(0);
         }
 
         .close-overlay-btn {
-            margin-top: 35px;
+            margin-top: 25px;
             background: rgba(255, 255, 255, 0.2);
             color: #ffffff;
             border: 1px solid rgba(255, 255, 255, 0.4);
@@ -549,15 +661,157 @@
         </div>
     </div>
 
-    <!-- OVERLAY NGEBLUR HITAM DAN BUNGA BESAR -->
+    <!-- OVERLAY NGEBLUR HITAM DAN BUNGA BESAR DENGAN TOMBOL COVER & STIKER -->
     <div class="dark-overlay" id="darkOverlay">
-        <div class="big-flower">🌺</div>
+        
+        <!-- TOMBOL START COVER LAGU (DI ATAS BUNGA) -->
+        <button class="music-start-btn" id="startCoverBtn">
+            <span>▶️</span> <span>aku cover lagu buat mu</span>
+        </button>
+
+        <div class="flower-sticker-container" id="flowerStickerArea">
+            <!-- Stiker Rara di Kiri Bunga -->
+            <img src="rara1.jpeg" class="side-sticker left" alt="Rara Sticker">
+            
+            <!-- Bunga Besar Utama -->
+            <div class="big-flower" id="bigFlower" title="Tekan bunganya!">🌺</div>
+            
+            <!-- Stiker Milan di Kanan Bunga -->
+            <img src="milan.jpg" class="side-sticker right" alt="Milan Sticker">
+        </div>
+
         <div class="flower-text">Bunga Indah Khusus Buat RARA ✨</div>
+        <div class="click-hint-text">👈 Tekan bunganya! ✨ 👉</div>
         <button class="close-overlay-btn" id="closeOverlayBtn">Tutup</button>
     </div>
 
     <script>
-        // --- LOGIK AMPLOP & FOTO ---
+        // --- PERBAIKAN PENTING EFEEK SUARA (PENGGUNAAN NAMA FILE DENGAN / DAN TANPA EXTRA EXTENSION BISA TERATASI) ---
+        function createAudio(filename) {
+            const audio = new Audio(filename);
+            audio.preload = 'auto';
+            return audio;
+        }
+
+        // Jalankan percakapan langsung ke file mp3 standar
+        const sounds = {
+            fire: createAudio('fire_sound.mp3'),
+            timer: createAudio('timer_sound.mp3'),
+            explosion: createAudio('explosion_sound.mp3'),
+            bloop: createAudio('bloop_sound.mp3'),
+            cover: createAudio('cover.mp3')
+        };
+
+        // Mekanisme Unlock Browser Audio universal
+        let isUnlocked = false;
+        function unlockAudio() {
+            if (isUnlocked) return;
+            Object.keys(sounds).forEach(key => {
+                if (key !== 'cover') {
+                    sounds[key].play().then(() => {
+                        sounds[key].pause();
+                        sounds[key].currentTime = 0;
+                    }).catch(err => {
+                        // Jika tidak ada fire_sound.mp3, coba fallback ke versi double extension
+                        if (key === 'fire') sounds.fire = createAudio('fire_sound.mp3.mp3');
+                        if (key === 'timer') sounds.timer = createAudio('timer_sound.mp3.mp3');
+                        if (key === 'explosion') sounds.explosion = createAudio('explosion_sound.mp3.mp3');
+                        if (key === 'bloop') sounds.bloop = createAudio('bloop_sound.mp3.mp3');
+                    });
+                }
+            });
+            isUnlocked = true;
+        }
+
+        // Pemicu unlock suara saat layar disentuh pertama kali
+        document.addEventListener('click', unlockAudio, { once: true });
+        document.addEventListener('touchstart', unlockAudio, { once: true });
+        document.addEventListener('mousedown', unlockAudio, { once: true });
+
+        function playSound(audioKey) {
+            const audio = sounds[audioKey];
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play().catch(e => {
+                    console.log("Mencoba fallback nama file...");
+                    // Jika fail karena extension .mp3.mp3 di Windows
+                    const fallbackAudio = new Audio(audioKey + '_sound.mp3.mp3');
+                    fallbackAudio.play().catch(err => console.log("Gagal total play sound:", err));
+                });
+            }
+        }
+
+        function stopSound(audioKey) {
+            const audio = sounds[audioKey];
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+        }
+
+        // --- LOGIK COVER LAGU & SEMBURAN NOTE MUSIK ---
+        const startCoverBtn = document.getElementById('startCoverBtn');
+        let noteBurstInterval = null;
+
+        startCoverBtn.addEventListener('click', function() {
+            if (sounds.cover.paused) {
+                sounds.cover.play();
+                startCoverBtn.innerHTML = '<span>⏸️</span> <span>Hentikan lagu</span>';
+                startNoteBurst();
+            } else {
+                sounds.cover.pause();
+                sounds.cover.currentTime = 0;
+                startCoverBtn.innerHTML = '<span>▶️</span> <span>aku cover lagu buat mu</span>';
+                stopNoteBurst();
+            }
+        });
+
+        sounds.cover.addEventListener('ended', function() {
+            startCoverBtn.innerHTML = '<span>▶️</span> <span>aku cover lagu buat mu</span>';
+            stopNoteBurst();
+        });
+
+        function startNoteBurst() {
+            if (noteBurstInterval) clearInterval(noteBurstInterval);
+            const notesList = ['🎵', '🎶', '🎼', '🎸', '🎹', '✨'];
+            const container = document.getElementById('flowerStickerArea');
+
+            noteBurstInterval = setInterval(() => {
+                const rect = container.getBoundingClientRect();
+                const startX = rect.left + (rect.width / 2);
+                const startY = rect.top + (rect.height / 2);
+
+                createNoteElement(startX, startY, notesList);
+            }, 180);
+        }
+
+        function stopNoteBurst() {
+            if (noteBurstInterval) {
+                clearInterval(noteBurstInterval);
+                noteBurstInterval = null;
+            }
+        }
+
+        function createNoteElement(x, y, list) {
+            const el = document.createElement('div');
+            el.className = 'floating-note';
+            el.textContent = list[Math.floor(Math.random() * list.length)];
+            
+            const randomXOffset = (Math.random() - 0.5) * 200;
+            const randomSize = Math.floor(Math.random() * 20) + 24;
+            const vx = (Math.random() - 0.5) * 350;
+
+            el.style.left = (x + randomXOffset) + 'px';
+            el.style.top = y + 'px';
+            el.style.fontSize = randomSize + 'px';
+            el.style.setProperty('--vx', vx + 'px');
+
+            document.body.appendChild(el);
+
+            setTimeout(() => { el.remove(); }, 3500);
+        }
+
+        // --- LOGIK AMPLOP & FOTO SURAT ---
         const envelopeWrapper = document.getElementById('envelopeWrapper');
         const hintText = document.getElementById('hintText');
         const photoContainer = document.getElementById('photoContainer');
@@ -576,14 +830,9 @@
             
             if (envelopeWrapper.classList.contains('open')) {
                 hintText.textContent = "Klik latar/amplop untuk menutup";
-                
                 setTimeout(() => {
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }, 200);
-
             } else {
                 hintText.textContent = "Klik amplop untuk membuka";
                 photoContainer.style.display = "none";
@@ -627,6 +876,7 @@
         const gameInstruction = document.getElementById('gameInstruction');
         const darkOverlay = document.getElementById('darkOverlay');
         const closeOverlayBtn = document.getElementById('closeOverlayBtn');
+        const bigFlower = document.getElementById('bigFlower');
 
         let isLit = false;
         let fuseLit = false;
@@ -693,11 +943,12 @@
                      rect1.top > rect2.bottom);
         }
 
-        // 1. Menyalakan Korek
         function lightMatch() {
             isLit = true;
             matchFlame.style.display = "block";
             gameInstruction.textContent = "Korek menyala! Cepat bakarkan ke sumbu bom! (3s)";
+            
+            playSound('fire'); // Putar Suara Korek Menyala
 
             matchTimer = setTimeout(() => {
                 if (!fuseLit) {
@@ -708,12 +959,13 @@
             }, 3000);
         }
 
-        // 2. Bakar Sumbu & Bom Membesar Otomatis
         function lightFuse() {
             fuseLit = true;
             clearTimeout(matchTimer);
             sparkFire.style.display = "block";
             gameInstruction.textContent = "Sumbu terbakar! Bom siap meledak dalam 3 detik... 💣";
+
+            playSound('timer'); // Putar Suara Detik Bom
 
             bombBody.classList.add('growing');
 
@@ -722,13 +974,15 @@
             }, 3000);
         }
 
-        // 3. LEDAKAN SEMBURAN BUNGA + OVERLAY HITAM BLUR
+        // --- LEDAKAN BUNGA KECIL & OVERLAY AKHIR ---
         function explodeFlowers() {
+            stopSound('timer');
+            playSound('explosion'); // Putar Suara Ledakan Bom
+
             sparkFire.style.display = "none";
             matchFlame.style.display = "none";
             bombBody.style.opacity = "0";
 
-            // Semburan Confetti
             confetti({
                 particleCount: 120,
                 spread: 100,
@@ -736,26 +990,26 @@
                 colors: ['#f48fb1', '#d81b60', '#ff80ab', '#ffb74d', '#ffffff']
             });
 
-            // Munculkan Semburan Bunga Melayang
             const flowersList = ['🌸', '🌺', '🌷', '🌹', '🌻', '💐', '✨'];
+
             const bombRect = bombBody.getBoundingClientRect();
             const startX = bombRect.left + (bombRect.width / 2);
             const startY = bombRect.top;
 
-            let flowerCount = 0;
-            const flowerInterval = setInterval(() => {
+            let count = 0;
+            const burstInterval = setInterval(() => {
                 createFlowerElement(startX, startY, flowersList);
-                flowerCount++;
-                if (flowerCount > 40) {
-                    clearInterval(flowerInterval);
-                    gameInstruction.textContent = "Bunga yang indah untuk RARA ✨🌸";
+
+                count++;
+                if (count > 35) {
+                    clearInterval(burstInterval);
+                    gameInstruction.textContent = "Bunga Indah untuk RARA ✨🌸";
                     
-                    // TAMPILKAN OVERLAY BLUR HITAM & BUNGA BESAR SETELAH SEMBURAN
                     setTimeout(() => {
                         darkOverlay.classList.add('active');
                     }, 800);
                 }
-            }, 50);
+            }, 60);
         }
 
         function createFlowerElement(x, y, list) {
@@ -774,14 +1028,22 @@
 
             document.body.appendChild(el);
 
-            setTimeout(() => {
-                el.remove();
-            }, 3500);
+            setTimeout(() => { el.remove(); }, 3500);
         }
 
-        // Tombol Tutup Overlay
+        bigFlower.addEventListener('click', function() {
+            playSound('bloop'); // Putar Suara Bloop saat Bunga Ditekan
+            
+            bigFlower.classList.remove('blooped');
+            void bigFlower.offsetWidth; 
+            bigFlower.classList.add('blooped');
+        });
+
         closeOverlayBtn.addEventListener('click', function() {
             darkOverlay.classList.remove('active');
+            sounds.cover.pause();
+            stopNoteBurst();
+            startCoverBtn.innerHTML = '<span>▶️</span> <span>aku cover lagu buat mu</span>';
         });
     </script>
 </body>
