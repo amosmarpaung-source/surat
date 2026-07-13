@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surat Untuk RARA</title>
     
-    <!-- Pustaka Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
@@ -601,19 +600,16 @@
 </head>
 <body>
 
-    <!-- INTRUKSI DI ATAS AMPLOP -->
     <div class="top-instruction" id="topInstruction">
         ✉️ Buka amplop terlebih dahulu ya!
     </div>
 
-    <!-- CONTAINER AMPLOP -->
     <div class="wrapper" id="envelopeWrapper">
         <div class="flap"></div>
         <div class="envelope">
             <span class="envelope-text">For: RARA</span>
         </div>
         
-        <!-- SURAT -->
         <div class="letter" id="letterBox">
             <div class="photo-container" id="photoContainer">
                 <div class="photo-wrapper">
@@ -633,23 +629,19 @@
         <div class="hint" id="hintText">Klik amplop untuk membuka</div>
     </div>
 
-    <!-- ARENA GAME KOREK & BOM -->
     <div class="game-area">
         <div class="game-instruction" id="gameInstruction">
             Geser korek ke kotak merah untuk menyalakan!
         </div>
         
         <div class="interactive-container">
-            <!-- Kotak Korek -->
             <div class="match-box" id="matchBox">GESEK SINI</div>
 
-            <!-- Batang Korek Dragable -->
             <div class="match-stick" id="matchStick" style="right: 35px; top: 35px;">
                 <div class="match-head"></div>
                 <div class="match-flame" id="matchFlame">🔥</div>
             </div>
 
-            <!-- Objek Bom 3D -->
             <div class="bomb-wrapper" id="bombWrapper">
                 <div class="bomb-body" id="bombBody">
                     <div class="bomb-cap"></div>
@@ -661,22 +653,17 @@
         </div>
     </div>
 
-    <!-- OVERLAY NGEBLUR HITAM DAN BUNGA BESAR DENGAN TOMBOL COVER & STIKER -->
     <div class="dark-overlay" id="darkOverlay">
         
-        <!-- TOMBOL START COVER LAGU (DI ATAS BUNGA) -->
         <button class="music-start-btn" id="startCoverBtn">
             <span>▶️</span> <span>aku cover lagu buat mu</span>
         </button>
 
         <div class="flower-sticker-container" id="flowerStickerArea">
-            <!-- Stiker Rara di Kiri Bunga -->
             <img src="rara1.jpeg" class="side-sticker left" alt="Rara Sticker">
             
-            <!-- Bunga Besar Utama -->
             <div class="big-flower" id="bigFlower" title="Tekan bunganya!">🌺</div>
             
-            <!-- Stiker Milan di Kanan Bunga -->
             <img src="milan.jpg" class="side-sticker right" alt="Milan Sticker">
         </div>
 
@@ -686,66 +673,131 @@
     </div>
 
     <script>
-        // --- PERBAIKAN PENTING EFEEK SUARA (PENGGUNAAN NAMA FILE DENGAN / DAN TANPA EXTRA EXTENSION BISA TERATASI) ---
-        function createAudio(filename) {
-            const audio = new Audio(filename);
-            audio.preload = 'auto';
-            return audio;
+        // --- SISTEM SUARA HYBRID HP (FILE AUDIO + DIGITAL SYNTHESIZER FALLBACK) ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudioCtx() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
         }
 
-        // Jalankan percakapan langsung ke file mp3 standar
-        const sounds = {
-            fire: createAudio('fire_sound.mp3'),
-            timer: createAudio('timer_sound.mp3'),
-            explosion: createAudio('explosion_sound.mp3'),
-            bloop: createAudio('bloop_sound.mp3'),
-            cover: createAudio('cover.mp3')
+        // Jalankan multi-file loader untuk cegah issue extension .mp3 / .mp3.mp3
+        const audioFiles = {
+            fire: ['fire_sound.mp3', 'fire_sound.mp3.mp3'],
+            timer: ['timer_sound.mp3', 'timer_sound.mp3.mp3'],
+            explosion: ['explosion_sound.mp3', 'explosion_sound.mp3.mp3'],
+            bloop: ['bloop_sound.mp3', 'bloop_sound.mp3.mp3'],
+            cover: ['cover.mp3']
         };
 
-        // Mekanisme Unlock Browser Audio universal
+        const sounds = {};
+
+        // Inisialisasi Audio Element
+        Object.keys(audioFiles).forEach(key => {
+            sounds[key] = new Audio();
+            sounds[key].src = audioFiles[key][0];
+            sounds[key].preload = 'auto';
+        });
+
+        // Autoplay Unlocker Khusus HP (iPhone/Android)
         let isUnlocked = false;
-        function unlockAudio() {
+        function unlockAudioHP() {
             if (isUnlocked) return;
+            initAudioCtx();
+
             Object.keys(sounds).forEach(key => {
                 if (key !== 'cover') {
                     sounds[key].play().then(() => {
                         sounds[key].pause();
                         sounds[key].currentTime = 0;
-                    }).catch(err => {
-                        // Jika tidak ada fire_sound.mp3, coba fallback ke versi double extension
-                        if (key === 'fire') sounds.fire = createAudio('fire_sound.mp3.mp3');
-                        if (key === 'timer') sounds.timer = createAudio('timer_sound.mp3.mp3');
-                        if (key === 'explosion') sounds.explosion = createAudio('explosion_sound.mp3.mp3');
-                        if (key === 'bloop') sounds.bloop = createAudio('bloop_sound.mp3.mp3');
+                    }).catch(() => {
+                        // Jika nama file pertama gagal, coba nama file alternatif (.mp3.mp3)
+                        if (audioFiles[key][1]) {
+                            sounds[key].src = audioFiles[key][1];
+                            sounds[key].load();
+                        }
                     });
                 }
             });
             isUnlocked = true;
         }
 
-        // Pemicu unlock suara saat layar disentuh pertama kali
-        document.addEventListener('click', unlockAudio, { once: true });
-        document.addEventListener('touchstart', unlockAudio, { once: true });
-        document.addEventListener('mousedown', unlockAudio, { once: true });
+        document.addEventListener('touchstart', unlockAudioHP, { once: true });
+        document.addEventListener('click', unlockAudioHP, { once: true });
 
-        function playSound(audioKey) {
-            const audio = sounds[audioKey];
-            if (audio) {
-                audio.currentTime = 0;
-                audio.play().catch(e => {
-                    console.log("Mencoba fallback nama file...");
-                    // Jika fail karena extension .mp3.mp3 di Windows
-                    const fallbackAudio = new Audio(audioKey + '_sound.mp3.mp3');
-                    fallbackAudio.play().catch(err => console.log("Gagal total play sound:", err));
-                });
+        // Deringkan Suara Efek (Dengan fallback digital jika file audio di GitHub bermasalah)
+        function playSound(type) {
+            initAudioCtx();
+            const snd = sounds[type];
+            let played = false;
+
+            if (snd && snd.src) {
+                snd.currentTime = 0;
+                let promise = snd.play();
+                if (promise !== undefined) {
+                    promise.then(() => { played = true; }).catch(err => {
+                        playSynthSound(type); // Gunakan suara digital jika file diblokir browser HP
+                    });
+                }
+            } else {
+                playSynthSound(type);
             }
         }
 
-        function stopSound(audioKey) {
-            const audio = sounds[audioKey];
-            if (audio) {
-                audio.pause();
-                audio.currentTime = 0;
+        function stopSound(type) {
+            const snd = sounds[type];
+            if (snd) {
+                snd.pause();
+                snd.currentTime = 0;
+            }
+        }
+
+        // GENERATOR SUARA DIGITAL EFESISIEN BILA FILE MP3 GAGAL DIMUAT DI HP
+        function playSynthSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'fire') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'timer') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'explosion') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.exponentialRampToValueAtTime(20, now + 0.8);
+                gain.gain.setValueAtTime(0.6, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.8);
+                osc.start(now);
+                osc.stop(now + 0.8);
+            } else if (type === 'bloop') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
             }
         }
 
@@ -754,8 +806,9 @@
         let noteBurstInterval = null;
 
         startCoverBtn.addEventListener('click', function() {
+            initAudioCtx();
             if (sounds.cover.paused) {
-                sounds.cover.play();
+                sounds.cover.play().catch(e => alert("Gagal memutar cover.mp3, pastikan file cover.mp3 ada di repository!"));
                 startCoverBtn.innerHTML = '<span>⏸️</span> <span>Hentikan lagu</span>';
                 startNoteBurst();
             } else {
@@ -948,7 +1001,7 @@
             matchFlame.style.display = "block";
             gameInstruction.textContent = "Korek menyala! Cepat bakarkan ke sumbu bom! (3s)";
             
-            playSound('fire'); // Putar Suara Korek Menyala
+            playSound('fire');
 
             matchTimer = setTimeout(() => {
                 if (!fuseLit) {
@@ -965,7 +1018,7 @@
             sparkFire.style.display = "block";
             gameInstruction.textContent = "Sumbu terbakar! Bom siap meledak dalam 3 detik... 💣";
 
-            playSound('timer'); // Putar Suara Detik Bom
+            playSound('timer');
 
             bombBody.classList.add('growing');
 
@@ -977,7 +1030,7 @@
         // --- LEDAKAN BUNGA KECIL & OVERLAY AKHIR ---
         function explodeFlowers() {
             stopSound('timer');
-            playSound('explosion'); // Putar Suara Ledakan Bom
+            playSound('explosion');
 
             sparkFire.style.display = "none";
             matchFlame.style.display = "none";
@@ -1032,7 +1085,7 @@
         }
 
         bigFlower.addEventListener('click', function() {
-            playSound('bloop'); // Putar Suara Bloop saat Bunga Ditekan
+            playSound('bloop');
             
             bigFlower.classList.remove('blooped');
             void bigFlower.offsetWidth; 
